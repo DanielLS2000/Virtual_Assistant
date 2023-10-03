@@ -1,10 +1,13 @@
 from datetime import datetime
-import speech_recognition  as sr
+import selenium.webdriver as webdriver
+from googlesearch import search
+import speech_recognition as sr
 import pyttsx3
 import webbrowser
 import wikipedia
-import wolframalpha
+# import wolframalpha
 
+google_api_key = "AIzaSyCYpvlWDD_eAb2A26e84Zk3FB5MbrFOD1I"
 
 # Speech Initialization
 Speech = pyttsx3.init()
@@ -16,6 +19,21 @@ activationword = 'computador'
 # Browser Configuration
 opera_path = r"C:\Users\Windows_PC\AppData\Local\Programs\Opera GX\opera.exe"
 webbrowser.register("opera", None, webbrowser.BackgroundBrowser(opera_path))
+
+# Wikipedia
+wikipedia.set_lang('pt')
+
+
+def web_search(search_term):
+    results = search(search_term, lang='pt', num=1, stop=1)
+    for result in results:
+        return result
+    
+    
+def wiki_search(search_term):
+    search_result = wikipedia.search(search_term, results=1)
+
+    return wikipedia.summary(search_result)
 
 def speak(text, rate=200):
     Speech.setProperty('rate', rate)
@@ -64,8 +82,15 @@ if __name__ == '__main__':
             elif query[0] == 'vá' and query[1] == 'para' or query[0] == 'abra':
                 query = " ".join(query[2:])
                 speak(f"Abrindo {query}")
-                webbrowser.get("opera").open_new(query)
-            elif query[0] == 'exit':
+                search_result = web_search(query)
+                
+                webbrowser.get("opera").open_new(search_result)
+            elif query[0] == 'pesquise' or query[0] == 'pesquisar':
+                speak("Pesquisando na Wikipedia")
+                query = " ".join(query[1:])
+                summary = wiki_search(query)
+                speak(summary)
+            elif query[0] == 'desligar':
                 exit()
     
     
